@@ -29,27 +29,13 @@ hedgehog-project/
 
 ### 统一技术栈
 
-**后端：**
-- Spring Boot 2.7.18 + Java 8 + Maven
-- MyBatis Plus 3.5.5（逻辑删除、雪花ID）
-- MySQL 8.0（远程 120.79.83.62:54231）
+详细技术栈见 `.claude/rules/`，通过 paths 限定按子项目自动加载：
 
-
-- JWT 认证（jjwt 0.12.5）+ BCrypt 密码加密
-- flexmark（Markdown → HTML）
-
-**前端（两个项目共用）：**
-- Vue 3.4 + TypeScript 5.4 + Vite 5.2
-- Pinia 2.1（状态管理）+ Vue Router 4.3（Hash 模式）
-- Axios 1.6（HTTP）+ Tailwind CSS 3.4（样式）
-- ESLint 8（flat config）+ Prettier 3.2
-
-**后台管理额外使用：**
-- Element Plus 2.7 + @element-plus/icons-vue
-- @kangc/v-md-editor（Markdown 编辑器，CodeMirror 内核）
-
-**博客前台额外使用：**
-- marked + highlight.js（Markdown 渲染 + 代码高亮）
+| 子项目 | 规则文件 |
+|--------|---------|
+| hedgehog-server | `tech-stack-backend.md` — Spring Boot 2.7 + Java 8 + MyBatis Plus + JWT + flexmark |
+| hedgehog-web | `tech-stack-frontend.md` — Vue 3 + TS + Element Plus + Tailwind CSS |
+| hedgehog-blog | `tech-stack-frontend.md` — Vue 3 + TS + Tailwind CSS（纯）+ marked |
 
 ---
 
@@ -413,4 +399,4 @@ Hedgehog
 查询方式：分页取 parent_id IS NULL 的顶级评论，再批量查其所有回复。
 
 ### 代码规范
-遵循已有的 CLAUDE.md 行为指南（先思考再编码、简单至上、精准修改、目标驱动执行）。新代码匹配现有项目风格。修改已有文件时只改必要部分，不做无关"改进"。
+遵循 `.claude/rules/` 中的编码行为指南（自动加载）。新代码匹配现有项目风格。修改已有文件时只改必要部分，不做无关"改进"。

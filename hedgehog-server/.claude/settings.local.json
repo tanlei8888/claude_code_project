@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(netstat -ano)",
-      "Bash(export JAVA_HOME=\"C:/Program Files/Java/jdk-1.8\")",
-      "Bash(\"d:/应用软件/IntelliJ IDEA 2024.1/plugins/maven/lib/maven3/bin/mvn\" -f d:/Work/claude_code_service/pom.xml spring-boot:run)"
-    ]
-  }
-}
