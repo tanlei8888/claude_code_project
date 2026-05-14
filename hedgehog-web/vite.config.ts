@@ -23,6 +23,13 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  optimizeDeps: {
+    include: [
+      '@kangc/v-md-editor',
+      'codemirror',
+      'highlight.js',
+    ],
+  },
   server: {
     port: 3000,
     proxy: {
