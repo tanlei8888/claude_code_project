@@ -10,6 +10,7 @@ export interface LoginResult {
   userId: number
   username: string
   nickname: string
+  role: string
 }
 
 export interface UserInfo {
@@ -19,6 +20,9 @@ export interface UserInfo {
   email: string
   phone: string
   status: number
+  role: string
+  avatar: string
+  bio: string
 }
 
 export function login(data: LoginParams): Promise<ApiResponse<LoginResult>> {

@@ -12,9 +12,34 @@
         text-color="#bfcbd9"
         active-text-color="#409EFF"
       >
+        <el-menu-item index="/dashboard">
+          <el-icon><DataBoard /></el-icon>
+          <template #title>仪表盘</template>
+        </el-menu-item>
+        <el-sub-menu index="content">
+          <template #title>
+            <el-icon><Document /></el-icon>
+            <span>内容管理</span>
+          </template>
+          <el-menu-item index="/articles">文章管理</el-menu-item>
+          <el-menu-item index="/categories">分类管理</el-menu-item>
+          <el-menu-item index="/tags">标签管理</el-menu-item>
+        </el-sub-menu>
         <el-menu-item index="/users">
           <el-icon><User /></el-icon>
           <template #title>用户管理</template>
+        </el-menu-item>
+        <el-menu-item index="/comments">
+          <el-icon><ChatLineSquare /></el-icon>
+          <template #title>评论管理</template>
+        </el-menu-item>
+        <el-menu-item index="/media">
+          <el-icon><Picture /></el-icon>
+          <template #title>媒体管理</template>
+        </el-menu-item>
+        <el-menu-item index="/site">
+          <el-icon><Setting /></el-icon>
+          <template #title>站点配置</template>
         </el-menu-item>
       </el-menu>
     </el-aside>
@@ -52,14 +77,20 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { User, Fold, Expand, ArrowDown } from '@element-plus/icons-vue'
+import { User, Fold, Expand, ArrowDown, DataBoard, Document, ChatLineSquare, Picture, Setting } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/user'
 
 const route = useRoute()
 const userStore = useUserStore()
 const isCollapse = ref(false)
 
-const activeMenu = computed(() => route.path)
+const activeMenu = computed(() => {
+  const path = route.path
+  if (path.startsWith('/articles')) return '/articles'
+  if (path.startsWith('/categories')) return '/categories'
+  if (path.startsWith('/tags')) return '/tags'
+  return path
+})
 
 function handleCommand(command: string) {
   if (command === 'logout') {

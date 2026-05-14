@@ -24,3 +24,7 @@ mybatis-plus:
 jwt:
   secret: hedgehog-jwt-secret-key-2024-must-be-at-least-256-bits-long
   expiration: 86400000
+
+app:
+  upload:
+    path: uploads

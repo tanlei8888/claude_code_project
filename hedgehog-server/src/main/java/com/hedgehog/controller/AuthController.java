@@ -8,7 +8,11 @@ import com.hedgehog.entity.User;
 import com.hedgehog.service.AuthService;
 import com.hedgehog.service.UserService;
 import javax.validation.Valid;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -16,6 +20,7 @@ public class AuthController {
 
     private final AuthService authService;
     private final UserService userService;
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public AuthController(AuthService authService, UserService userService) {
         this.authService = authService;
@@ -27,10 +32,39 @@ public class AuthController {
         return Result.ok(authService.login(request));
     }
 
+    @PostMapping("/register")
+    public Result<?> register(@RequestBody Map<String, String> body) {
+        String username = body.get("username");
+        String password = body.get("password");
+        String nickname = body.get("nickname");
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword(passwordEncoder.encode(password));
+        user.setNickname(nickname);
+        user.setStatus(1);
+        user.setRole("USER");
+        userService.save(user);
+        return Result.ok();
+    }
+
     @GetMapping("/info")
     public Result<User> info() {
         User user = userService.getById(UserContext.getUserId());
         user.setPassword(null);
         return Result.ok(user);
+    }
+
+    @PutMapping("/profile")
+    public Result<?> profile(@RequestBody Map<String, String> body) {
+        User user = userService.getById(UserContext.getUserId());
+        if (body.containsKey("nickname")) user.setNickname(body.get("nickname"));
+        if (body.containsKey("email")) user.setEmail(body.get("email"));
+        if (body.containsKey("avatar")) user.setAvatar(body.get("avatar"));
+        if (body.containsKey("bio")) user.setBio(body.get("bio"));
+        if (StringUtils.hasText(body.get("password"))) {
+            user.setPassword(passwordEncoder.encode(body.get("password")));
+        }
+        userService.updateById(user);
+        return Result.ok();
     }
 }

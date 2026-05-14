@@ -20,4 +20,7 @@ public class User {
     private LocalDateTime updateTime;
     @TableLogic
     private Integer deleted;
+    private String role;
+    private String avatar;
+    private String bio;
 }

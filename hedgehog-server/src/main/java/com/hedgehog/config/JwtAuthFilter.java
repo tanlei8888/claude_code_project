@@ -26,7 +26,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
         // 白名单路径跳过
         String path = request.getRequestURI();
-        if (path.startsWith("/api/auth/login")) {
+        if (path.startsWith("/api/auth/login") || path.startsWith("/api/auth/register")
+                || path.startsWith("/api/articles") || path.startsWith("/api/categories")
+                || path.startsWith("/api/tags") || path.startsWith("/api/comments")
+                || path.startsWith("/api/site/config") || path.startsWith("/api/admin/upload/")) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -41,7 +44,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         try {
             Long userId = jwtUtil.getUserIdFromToken(token);
+            String role = jwtUtil.parseToken(token).get("role", String.class);
             UserContext.setUserId(userId);
+            UserContext.setRole(role);
             filterChain.doFilter(request, response);
         } catch (Exception e) {
             response.setContentType("application/json;charset=UTF-8");

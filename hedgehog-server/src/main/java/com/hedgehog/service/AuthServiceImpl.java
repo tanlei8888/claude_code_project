@@ -35,12 +35,14 @@ public class AuthServiceImpl implements AuthService {
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new BusinessException(ResultCode.USERNAME_OR_PASSWORD_ERROR);
         }
-        String token = jwtUtil.generateToken(user.getId(), user.getUsername());
+        String role = user.getRole() != null ? user.getRole() : "USER";
+        String token = jwtUtil.generateToken(user.getId(), user.getUsername(), role);
         return LoginResponse.builder()
                 .token(token)
                 .userId(user.getId())
                 .username(user.getUsername())
                 .nickname(user.getNickname())
+                .role(role)
                 .build();
     }
 }
