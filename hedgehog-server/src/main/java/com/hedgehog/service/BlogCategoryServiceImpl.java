@@ -13,6 +13,9 @@ import org.springframework.util.StringUtils;
 
 import java.util.List;
 
+/**
+ * 分类服务实现。
+ */
 @Service
 public class BlogCategoryServiceImpl extends ServiceImpl<BlogCategoryMapper, BlogCategory> implements BlogCategoryService {
 
@@ -24,6 +27,7 @@ public class BlogCategoryServiceImpl extends ServiceImpl<BlogCategoryMapper, Blo
 
     @Override
     public void save(CategorySaveRequest request) {
+        // slug 为空时由名称自动生成拼音
         if (!StringUtils.hasText(request.getSlug())) {
             request.setSlug(SlugUtil.toSlug(request.getName()));
         }
@@ -49,6 +53,7 @@ public class BlogCategoryServiceImpl extends ServiceImpl<BlogCategoryMapper, Blo
         if (!StringUtils.hasText(request.getSlug())) {
             request.setSlug(SlugUtil.toSlug(request.getName()));
         }
+        // 检查 slug 唯一性（排除自身）
         BlogCategory exist = getOne(new LambdaQueryWrapper<BlogCategory>()
                 .eq(BlogCategory::getSlug, request.getSlug())
                 .ne(BlogCategory::getId, request.getId()));

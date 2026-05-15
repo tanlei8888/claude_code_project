@@ -11,6 +11,20 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+/**
+ * JWT 认证过滤器，在每个请求到达 Controller 前解析 token 并设置用户上下文。
+ *
+ * <p>处理流程：
+ * <ol>
+ *   <li>白名单路径（公开接口、静态资源）直接放行</li>
+ *   <li>从 Authorization 头提取 Bearer token</li>
+ *   <li>解析 token 获取 userId 和 role，存入 {@link UserContext}</li>
+ *   <li>请求结束后通过 finally 清除 UserContext，防止内存泄漏</li>
+ * </ol>
+ *
+ * @see UserContext
+ * @see com.hedgehog.util.JwtUtil
+ */
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
@@ -24,7 +38,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-        // 白名单路径跳过
+        // 白名单路径跳过 token 校验
         String path = request.getRequestURI();
         if (path.startsWith("/api/auth/login") || path.startsWith("/api/auth/register")
                 || path.startsWith("/api/articles") || path.startsWith("/api/categories")
@@ -53,10 +67,17 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             response.setStatus(401);
             response.getWriter().write("{\"code\":401,\"message\":\"token无效或已过期\"}");
         } finally {
+            // 确保请求结束后清理 ThreadLocal，防止内存泄漏
             UserContext.remove();
         }
     }
 
+    /**
+     * 从请求头中提取 Bearer token。
+     *
+     * @param request HTTP 请求
+     * @return token 字符串（不含 "Bearer " 前缀），无则返回 null
+     */
     private String extractToken(HttpServletRequest request) {
         String header = request.getHeader("Authorization");
         if (StringUtils.hasText(header) && header.startsWith("Bearer ")) {

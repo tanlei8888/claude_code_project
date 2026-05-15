@@ -14,6 +14,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+/**
+ * 用户服务实现。
+ */
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
 
@@ -22,6 +25,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public IPage<User> page(UserPageRequest request) {
         LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+        // 用户名和昵称联合模糊搜索
         if (StringUtils.hasText(request.getKeyword())) {
             wrapper.like(User::getUsername, request.getKeyword())
                     .or()
@@ -30,6 +34,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         wrapper.orderByDesc(User::getCreateTime);
         Page<User> page = new Page<>(request.getPage(), request.getSize());
         IPage<User> result = baseMapper.selectPage(page, wrapper);
+        // 脱敏：清除密码字段
         result.getRecords().forEach(u -> u.setPassword(null));
         return result;
     }
@@ -40,6 +45,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (user == null) {
             throw new BusinessException(ResultCode.USER_NOT_FOUND);
         }
+        // 脱敏：清除密码字段
         user.setPassword(null);
         return user;
     }
@@ -53,6 +59,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         User user = new User();
         user.setUsername(request.getUsername());
+        // 密码为空时默认 123456，使用 BCrypt 加密
         user.setPassword(passwordEncoder.encode(
                 StringUtils.hasText(request.getPassword()) ? request.getPassword() : "123456"));
         user.setNickname(request.getNickname());
@@ -68,6 +75,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (user == null) {
             throw new BusinessException(ResultCode.USER_NOT_FOUND);
         }
+        // 检查用户名唯一性（排除自身）
         User exist = getOne(new LambdaQueryWrapper<User>()
                 .eq(User::getUsername, request.getUsername())
                 .ne(User::getId, request.getId()));
@@ -75,6 +83,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new BusinessException(ResultCode.USERNAME_EXISTS);
         }
         user.setUsername(request.getUsername());
+        // 仅在新密码不为空时才更新密码
         if (StringUtils.hasText(request.getPassword())) {
             user.setPassword(passwordEncoder.encode(request.getPassword()));
         }

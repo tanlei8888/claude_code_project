@@ -19,6 +19,9 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * 评论服务实现。
+ */
 @Service
 public class BlogCommentServiceImpl extends ServiceImpl<BlogCommentMapper, BlogComment> implements BlogCommentService {
 
@@ -32,7 +35,7 @@ public class BlogCommentServiceImpl extends ServiceImpl<BlogCommentMapper, BlogC
 
     @Override
     public List<BlogComment> getCommentTree(Long articleId, int page, int size) {
-        // 分页取顶级评论
+        // 分页取顶级评论（parent_id IS NULL）
         Page<BlogComment> p = new Page<>(page, size);
         IPage<BlogComment> topLevel = baseMapper.selectPage(p, new LambdaQueryWrapper<BlogComment>()
                 .eq(BlogComment::getArticleId, articleId)
@@ -41,13 +44,13 @@ public class BlogCommentServiceImpl extends ServiceImpl<BlogCommentMapper, BlogC
                 .orderByDesc(BlogComment::getCreateTime));
         List<BlogComment> result = topLevel.getRecords();
         if (result.isEmpty()) return result;
-        // 批量取回复
+        // 批量取子回复
         Set<Long> parentIds = result.stream().map(BlogComment::getId).collect(Collectors.toSet());
         List<BlogComment> replies = list(new LambdaQueryWrapper<BlogComment>()
                 .in(BlogComment::getParentId, parentIds)
                 .eq(BlogComment::getStatus, 1)
                 .orderByAsc(BlogComment::getCreateTime));
-        // 收集所有用户ID
+        // 收集所有涉及的用户ID
         Set<Long> userIds = new HashSet<>();
         for (BlogComment c : result) { userIds.add(c.getUserId()); }
         for (BlogComment r : replies) {
@@ -59,7 +62,7 @@ public class BlogCommentServiceImpl extends ServiceImpl<BlogCommentMapper, BlogC
             userMap = userMapper.selectBatchIds(userIds).stream()
                     .collect(Collectors.toMap(User::getId, u -> { u.setPassword(null); return u; }));
         }
-        // 组装
+        // 组装：顶级评论 + 子回复 + 用户信息
         for (BlogComment top : result) {
             top.setUser(userMap.get(top.getUserId()));
             List<BlogComment> children = new ArrayList<>();
@@ -83,7 +86,7 @@ public class BlogCommentServiceImpl extends ServiceImpl<BlogCommentMapper, BlogC
         wrapper.orderByDesc(BlogComment::getCreateTime);
         Page<BlogComment> p = new Page<>(page, size);
         IPage<BlogComment> result = baseMapper.selectPage(p, wrapper);
-        // enrich users
+        // 批量填充评论者用户信息
         Set<Long> userIds = result.getRecords().stream().map(BlogComment::getUserId).collect(Collectors.toSet());
         if (!userIds.isEmpty()) {
             Map<Long, User> userMap = userMapper.selectBatchIds(userIds).stream()
@@ -105,9 +108,10 @@ public class BlogCommentServiceImpl extends ServiceImpl<BlogCommentMapper, BlogC
         comment.setContent(request.getContent());
         comment.setParentId(request.getParentId());
         comment.setReplyToUserId(request.getReplyToUserId());
+        // 新评论默认待审核
         comment.setStatus(0);
         baseMapper.insert(comment);
-        // 更新文章评论数
+        // 更新文章评论数（仅统计已通过的评论）
         long count = count(new LambdaQueryWrapper<BlogComment>()
                 .eq(BlogComment::getArticleId, request.getArticleId())
                 .eq(BlogComment::getStatus, 1));
@@ -123,7 +127,7 @@ public class BlogCommentServiceImpl extends ServiceImpl<BlogCommentMapper, BlogC
         }
         comment.setStatus(status);
         baseMapper.updateById(comment);
-        // 更新文章评论数
+        // 审核后同步更新文章评论数
         long count = count(new LambdaQueryWrapper<BlogComment>()
                 .eq(BlogComment::getArticleId, comment.getArticleId())
                 .eq(BlogComment::getStatus, 1));

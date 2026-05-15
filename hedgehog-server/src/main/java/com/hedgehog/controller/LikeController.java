@@ -8,6 +8,9 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * 点赞控制器，处理点赞/取消点赞和批量查询点赞状态。
+ */
 @RestController
 @RequestMapping("/api")
 public class LikeController {
@@ -18,12 +21,14 @@ public class LikeController {
         this.likeService = likeService;
     }
 
+    /** POST /api/likes/{articleId} — 点赞/取消点赞（toggle，需登录） */
     @PostMapping("/likes/{articleId}")
     public Result<?> toggle(@PathVariable Long articleId) {
         boolean liked = likeService.toggle(articleId);
         return Result.ok(liked);
     }
 
+    /** GET /api/likes/status — 批量查询点赞状态（需登录） */
     @GetMapping("/likes/status")
     public Result<?> status(@RequestParam String articleIds) {
         Set<Long> ids = Arrays.stream(articleIds.split(","))

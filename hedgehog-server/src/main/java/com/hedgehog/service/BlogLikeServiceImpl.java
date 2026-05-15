@@ -15,6 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * 点赞服务实现。
+ */
 @Service
 public class BlogLikeServiceImpl extends ServiceImpl<BlogLikeMapper, BlogLike> implements BlogLikeService {
 
@@ -36,11 +39,13 @@ public class BlogLikeServiceImpl extends ServiceImpl<BlogLikeMapper, BlogLike> i
                 .eq(BlogLike::getArticleId, articleId)
                 .eq(BlogLike::getUserId, userId));
         if (exist != null) {
+            // 取消点赞：删除记录并扣减 like_count
             baseMapper.deleteById(exist.getId());
             article.setLikeCount(Math.max(0, article.getLikeCount() - 1));
             articleMapper.updateById(article);
             return false;
         } else {
+            // 添加点赞：插入记录并增加 like_count
             BlogLike like = new BlogLike();
             like.setArticleId(articleId);
             like.setUserId(userId);

@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
+/**
+ * 仪表盘控制器，提供后台首页统计数据。
+ */
 @RestController
 @RequestMapping("/api/admin")
 public class DashboardController {
@@ -25,6 +28,7 @@ public class DashboardController {
         this.commentService = commentService;
     }
 
+    /** GET /api/admin/dashboard — 仪表盘统计数据 + 最近 5 篇文章 */
     @AdminRequired
     @GetMapping("/dashboard")
     public Result<?> dashboard() {

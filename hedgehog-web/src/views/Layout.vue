@@ -6,11 +6,12 @@
       </div>
       <el-menu
         :default-active="activeMenu"
-        router
+        :default-openeds="defaultOpeneds"
         :collapse="isCollapse"
         background-color="#304156"
         text-color="#bfcbd9"
         active-text-color="#409EFF"
+        @select="handleMenuSelect"
       >
         <el-menu-item index="/dashboard">
           <el-icon><DataBoard /></el-icon>
@@ -76,11 +77,12 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { User, Fold, Expand, ArrowDown, DataBoard, Document, ChatLineSquare, Picture, Setting } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/user'
 
 const route = useRoute()
+const router = useRouter()
 const userStore = useUserStore()
 const isCollapse = ref(false)
 
@@ -91,6 +93,18 @@ const activeMenu = computed(() => {
   if (path.startsWith('/tags')) return '/tags'
   return path
 })
+
+const defaultOpeneds = computed(() => {
+  const path = route.path
+  if (path.startsWith('/articles') || path.startsWith('/categories') || path.startsWith('/tags')) {
+    return ['content']
+  }
+  return []
+})
+
+function handleMenuSelect(index: string) {
+  router.push(index)
+}
 
 function handleCommand(command: string) {
   if (command === 'logout') {

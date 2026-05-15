@@ -28,6 +28,7 @@ export default defineConfig({
       '@kangc/v-md-editor',
       'codemirror',
       'highlight.js',
+      'prismjs',
     ],
   },
   server: {

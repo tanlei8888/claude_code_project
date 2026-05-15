@@ -10,6 +10,9 @@ import com.hedgehog.util.JwtUtil;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+/**
+ * 认证服务实现。
+ */
 @Service
 public class AuthServiceImpl implements AuthService {
 
@@ -26,12 +29,15 @@ public class AuthServiceImpl implements AuthService {
     public LoginResponse login(LoginRequest request) {
         User user = userService.getOne(new LambdaQueryWrapper<User>()
                 .eq(User::getUsername, request.getUsername()));
+        // 统一返回"用户名或密码错误"，防止用户枚举
         if (user == null) {
             throw new BusinessException(ResultCode.USERNAME_OR_PASSWORD_ERROR);
         }
+        // 检查用户状态
         if (user.getStatus() == 0) {
             throw new BusinessException(ResultCode.USER_DISABLED);
         }
+        // BCrypt 密码校验
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new BusinessException(ResultCode.USERNAME_OR_PASSWORD_ERROR);
         }

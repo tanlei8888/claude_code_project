@@ -51,7 +51,7 @@
         </el-form>
       </el-tab-pane>
       <el-tab-pane label="关于页">
-        <v-md-editor v-model="form.aboutContentMd" height="400px" />
+        <v-md-editor v-model="form.aboutContentMd" height="400px" class="w-full" />
       </el-tab-pane>
     </el-tabs>
     <div class="mt-6">
@@ -71,7 +71,7 @@ const form = ref<SiteConfig>({
   socialGithub: '', socialTwitter: '', socialZhihu: '', icpNumber: '', footerText: '',
 })
 
-const saving = ref(false)
+  const saving = ref(false)
 
 async function handleSave() {
   saving.value = true
@@ -83,6 +83,12 @@ async function handleSave() {
 
 onMounted(async () => {
   const res = await getSiteConfig()
-  if (res.data) form.value = res.data
+  if (res.data) {
+    form.value = {
+      ...res.data,
+      aboutContentMd: res.data.aboutContentMd ?? '',
+      aboutContentHtml: res.data.aboutContentHtml ?? '',
+    }
+  }
 })
 </script>

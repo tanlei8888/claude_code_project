@@ -13,6 +13,9 @@ import org.springframework.util.StringUtils;
 
 import java.util.List;
 
+/**
+ * 标签服务实现。
+ */
 @Service
 public class BlogTagServiceImpl extends ServiceImpl<BlogTagMapper, BlogTag> implements BlogTagService {
 
@@ -24,6 +27,7 @@ public class BlogTagServiceImpl extends ServiceImpl<BlogTagMapper, BlogTag> impl
 
     @Override
     public void save(TagSaveRequest request) {
+        // slug 为空时由名称自动生成拼音
         if (!StringUtils.hasText(request.getSlug())) {
             request.setSlug(SlugUtil.toSlug(request.getName()));
         }
@@ -47,6 +51,7 @@ public class BlogTagServiceImpl extends ServiceImpl<BlogTagMapper, BlogTag> impl
         if (!StringUtils.hasText(request.getSlug())) {
             request.setSlug(SlugUtil.toSlug(request.getName()));
         }
+        // 检查 slug 唯一性（排除自身）
         BlogTag exist = getOne(new LambdaQueryWrapper<BlogTag>()
                 .eq(BlogTag::getSlug, request.getSlug())
                 .ne(BlogTag::getId, request.getId()));

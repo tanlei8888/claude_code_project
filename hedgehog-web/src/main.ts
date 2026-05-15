@@ -8,12 +8,13 @@ import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import App from './App.vue'
 import router from './router'
 import './styles/global.css'
+import Prism from 'prismjs'
 import VMdEditor from '@kangc/v-md-editor'
 import vuepressTheme from '@kangc/v-md-editor/lib/theme/vuepress.js'
 import '@kangc/v-md-editor/lib/style/base-editor.css'
 import '@kangc/v-md-editor/lib/theme/style/vuepress.css'
 
-VMdEditor.use(vuepressTheme)
+VMdEditor.use(vuepressTheme, { Prism })
 
 const app = createApp(App)
 
