@@ -23,6 +23,12 @@ public class UserSaveRequest {
     private String email;
     /** 手机号 */
     private String phone;
+    /** 头像 URL */
+    private String avatar;
+    /** 个人简介 */
+    private String bio;
+    /** 角色：ADMIN / USER */
+    private String role;
     /** 状态：0=禁用 1=启用 */
     private Integer status;
 }

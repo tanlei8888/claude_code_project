@@ -119,6 +119,8 @@ async function handleComment() {
     newComment.value = ''
     totalComments.value++
     await loadComments(1)
+  } catch {
+    // 错误消息已由全局拦截器统一展示，此处仅阻止状态变更
   } finally {
     submitting.value = false
   }
@@ -137,7 +139,9 @@ async function handleReply(parent: Comment) {
     replyTo.value = null
     totalComments.value++
     await loadComments(1)
-  } catch {}
+  } catch {
+    // 错误消息已由全局拦截器统一展示，此处仅阻止状态变更
+  }
 }
 
 function formatDate(date: string) {

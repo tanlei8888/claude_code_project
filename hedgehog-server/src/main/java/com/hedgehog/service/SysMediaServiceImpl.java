@@ -9,6 +9,7 @@ import com.hedgehog.config.UserContext;
 import com.hedgehog.entity.SysMedia;
 import com.hedgehog.exception.BusinessException;
 import com.hedgehog.mapper.SysMediaMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,6 +25,7 @@ import java.util.UUID;
 /**
  * 媒体资源服务实现。
  */
+@Slf4j
 @Service
 public class SysMediaServiceImpl extends ServiceImpl<SysMediaMapper, SysMedia> implements SysMediaService {
 
@@ -36,7 +38,7 @@ public class SysMediaServiceImpl extends ServiceImpl<SysMediaMapper, SysMedia> i
     private String uploadPath;
 
     @Override
-    public SysMedia upload(MultipartFile file) {
+    public SysMedia upload(MultipartFile file, String mediaType) {
         if (file.isEmpty()) {
             throw new BusinessException(ResultCode.FILE_UPLOAD_FAILED);
         }
@@ -51,14 +53,20 @@ public class SysMediaServiceImpl extends ServiceImpl<SysMediaMapper, SysMedia> i
         // 按日期分子目录：yyyy/MM
         String dateDir = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy/MM"));
         File dir = new File(uploadPath, dateDir);
-        if (!dir.exists()) dir.mkdirs();
+        // 确保上传目录存在，若创建失败则抛出异常
+        if (!dir.exists() && !dir.mkdirs()) {
+            log.error("无法创建上传目录: {}", dir.getAbsolutePath());
+            throw new BusinessException(ResultCode.FILE_UPLOAD_FAILED);
+        }
         // 生成唯一文件名
         String ext = getExtension(file.getOriginalFilename());
         String newFilename = UUID.randomUUID().toString() + ext;
         File dest = new File(dir, newFilename);
         try {
-            file.transferTo(dest);
+            // transferTo 内部使用 getPath() 取路径，相对路径会被 Tomcat 拼到临时工作目录，必须传绝对路径
+            file.transferTo(dest.getAbsoluteFile());
         } catch (IOException e) {
+            log.error("文件写入失败: dest={}, size={}", dest.getAbsolutePath(), file.getSize(), e);
             throw new BusinessException(ResultCode.FILE_UPLOAD_FAILED);
         }
         String relativePath = dateDir + "/" + newFilename;
@@ -70,6 +78,8 @@ public class SysMediaServiceImpl extends ServiceImpl<SysMediaMapper, SysMedia> i
         media.setFileSize(file.getSize());
         media.setMimeType(file.getContentType());
         media.setUploadUserId(UserContext.getUserId());
+        // 使用上传时指定的媒体类型，未指定则默认为 CONTENT
+        media.setMediaType(mediaType != null ? mediaType : "CONTENT");
         baseMapper.insert(media);
         return media;
     }
@@ -99,5 +109,12 @@ public class SysMediaServiceImpl extends ServiceImpl<SysMediaMapper, SysMedia> i
         if (filename == null) return "";
         int i = filename.lastIndexOf('.');
         return i >= 0 ? filename.substring(i) : "";
+    }
+
+    @Override
+    public List<SysMedia> getAvatars() {
+        return list(new LambdaQueryWrapper<SysMedia>()
+                .eq(SysMedia::getMediaType, "AVATAR")
+                .orderByDesc(SysMedia::getCreateTime));
     }
 }

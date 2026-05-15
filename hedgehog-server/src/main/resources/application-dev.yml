@@ -5,6 +5,11 @@ spring:
   sql:
     init:
       mode: always
+      encoding: UTF-8
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 12MB
   datasource:
     url: jdbc:mysql://120.79.83.62:54231/hedgehog_dev?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&connectionCollation=utf8mb4_unicode_ci
     username: root

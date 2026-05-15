@@ -65,6 +65,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         user.setNickname(request.getNickname());
         user.setEmail(request.getEmail());
         user.setPhone(request.getPhone());
+        user.setAvatar(request.getAvatar());
+        user.setBio(request.getBio());
+        user.setRole(StringUtils.hasText(request.getRole()) ? request.getRole() : "USER");
         user.setStatus(request.getStatus() != null ? request.getStatus() : 1);
         super.save(user);
     }
@@ -90,6 +93,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         user.setNickname(request.getNickname());
         user.setEmail(request.getEmail());
         user.setPhone(request.getPhone());
+        user.setAvatar(request.getAvatar());
+        user.setBio(request.getBio());
+        if (StringUtils.hasText(request.getRole())) user.setRole(request.getRole());
         user.setStatus(request.getStatus());
         super.updateById(user);
     }

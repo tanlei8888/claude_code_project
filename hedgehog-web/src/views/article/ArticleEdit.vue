@@ -39,7 +39,7 @@
         <el-date-picker v-model="form.publishTime" type="datetime" placeholder="选择发布时间" value-format="YYYY-MM-DD HH:mm:ss" />
       </el-form-item>
       <el-form-item label="置顶">
-        <el-switch v-model="form.isTop" />
+        <el-switch v-model="form.isTop" :active-value="1" :inactive-value="0" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="handleSave" :loading="saving">保存</el-button>

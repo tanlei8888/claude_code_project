@@ -38,6 +38,19 @@
             </el-tag>
           </template>
         </el-table-column>
+        <el-table-column prop="role" label="角色" width="90">
+          <template #default="{ row }">
+            <el-tag v-if="row.role === 'ADMIN'" size="small">管理员</el-tag>
+            <el-tag v-else type="info" size="small">用户</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="头像" width="80">
+          <template #default="{ row }">
+            <el-avatar v-if="row.avatar" :src="row.avatar" :size="32" />
+            <span v-else class="text-gray-400 text-xs">-</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="bio" label="个人简介" min-width="140" show-overflow-tooltip />
         <el-table-column prop="createTime" label="创建时间" width="180" />
         <el-table-column label="操作" width="180" fixed="right">
           <template #default="{ row }">
@@ -92,6 +105,18 @@
         <el-form-item label="手机号" prop="phone">
           <el-input v-model="dialogForm.phone" />
         </el-form-item>
+        <el-form-item label="头像 URL" prop="avatar">
+          <el-input v-model="dialogForm.avatar" placeholder="头像图片链接" />
+        </el-form-item>
+        <el-form-item label="个人简介" prop="bio">
+          <el-input v-model="dialogForm.bio" type="textarea" :rows="2" placeholder="一句话介绍" />
+        </el-form-item>
+        <el-form-item label="角色" prop="role">
+          <el-radio-group v-model="dialogForm.role">
+            <el-radio value="USER">普通用户</el-radio>
+            <el-radio value="ADMIN">管理员</el-radio>
+          </el-radio-group>
+        </el-form-item>
         <el-form-item label="状态" prop="status">
           <el-radio-group v-model="dialogForm.status">
             <el-radio :value="1">启用</el-radio>
@@ -110,7 +135,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
 import { Search, Refresh, Plus, Edit, Delete } from '@element-plus/icons-vue'
-import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
+import { ElMessage, ElMessageBox, type FormInstance, type FormRules, type FormItemRule } from 'element-plus'
 import { getUserPage, saveUser, updateUser, deleteUser } from '@/api/user'
 
 interface UserRecord {
@@ -119,6 +144,9 @@ interface UserRecord {
   nickname: string
   email: string
   phone: string
+  avatar: string
+  bio: string
+  role: string
   status: number
   createTime: string
 }
@@ -138,12 +166,15 @@ const dialogVisible = ref(false)
 const dialogFormRef = ref<FormInstance>()
 const submitLoading = ref(false)
 const dialogForm = reactive({
-  id: null as number | null,
+  id: undefined as number | undefined,
   username: '',
   password: '',
   nickname: '',
   email: '',
   phone: '',
+  avatar: '',
+  bio: '',
+  role: 'USER',
   status: 1,
 })
 
@@ -193,6 +224,9 @@ function handleEdit(row: UserRecord) {
     nickname: row.nickname || '',
     email: row.email || '',
     phone: row.phone || '',
+    avatar: row.avatar || '',
+    bio: row.bio || '',
+    role: row.role || 'USER',
     status: row.status,
   })
   dialogVisible.value = true
@@ -214,7 +248,8 @@ async function handleDelete(row: UserRecord) {
 async function handleSubmit() {
   const rules = { ...dialogRules }
   if (dialogForm.id) {
-    rules.password[0].required = false
+    const pwRules = rules.password as FormItemRule[]
+    pwRules[0].required = false
   }
 
   const valid = await dialogFormRef.value?.validate().catch(() => false)
@@ -243,12 +278,15 @@ function handleDialogClosed() {
 }
 
 function resetDialogForm() {
-  dialogForm.id = null
+  dialogForm.id = undefined
   dialogForm.username = ''
   dialogForm.password = ''
   dialogForm.nickname = ''
   dialogForm.email = ''
   dialogForm.phone = ''
+  dialogForm.avatar = ''
+  dialogForm.bio = ''
+  dialogForm.role = 'USER'
   dialogForm.status = 1
   dialogFormRef.value?.clearValidate()
 }

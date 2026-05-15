@@ -9,7 +9,10 @@
         <router-link to="/" class="hover:text-gray-900 transition-colors">首页</router-link>
         <router-link to="/about" class="hover:text-gray-900 transition-colors">关于</router-link>
         <template v-if="userStore.isLoggedIn()">
-          <span class="text-gray-400">{{ userStore.info?.nickname }}</span>
+          <router-link to="/profile" class="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors">
+            <img :src="userStore.info?.avatar || defaultAvatar" class="w-6 h-6 rounded-full object-cover" />
+            <span>{{ userStore.info?.nickname }}</span>
+          </router-link>
           <button @click="handleLogout" class="text-gray-400 hover:text-red-500 transition-colors">退出</button>
         </template>
         <template v-else>
@@ -29,7 +32,10 @@
       <router-link to="/" class="block text-sm text-gray-600 py-1" @click="menuOpen = false">首页</router-link>
       <router-link to="/about" class="block text-sm text-gray-600 py-1" @click="menuOpen = false">关于</router-link>
       <template v-if="userStore.isLoggedIn()">
-        <span class="block text-sm text-gray-400 py-1">{{ userStore.info?.nickname }}</span>
+        <router-link to="/profile" class="flex items-center gap-2 py-1" @click="menuOpen = false">
+          <img :src="userStore.info?.avatar || defaultAvatar" class="w-5 h-5 rounded-full object-cover" />
+          <span class="text-sm text-gray-600">{{ userStore.info?.nickname }}</span>
+        </router-link>
         <button @click="handleLogout(); menuOpen = false" class="block text-sm text-gray-600 py-1">退出</button>
       </template>
       <template v-else>
@@ -49,6 +55,7 @@ const router = useRouter()
 const userStore = useUserStore()
 const siteName = ref('Hedgehog')
 const menuOpen = ref(false)
+const defaultAvatar = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjOTM1MkQzIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjNEM2REZGIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiByeD0iMjAiIGZpbGw9InVybCgjZykiLz48L3N2Zz4='
 
 onMounted(async () => {
   try {

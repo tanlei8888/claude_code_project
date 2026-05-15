@@ -4,14 +4,17 @@ import com.hedgehog.common.Result;
 import com.hedgehog.config.UserContext;
 import com.hedgehog.entity.LoginRequest;
 import com.hedgehog.entity.LoginResponse;
+import com.hedgehog.entity.SysMedia;
 import com.hedgehog.entity.User;
 import com.hedgehog.service.AuthService;
+import com.hedgehog.service.SysMediaService;
 import com.hedgehog.service.UserService;
 import javax.validation.Valid;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -23,11 +26,13 @@ public class AuthController {
 
     private final AuthService authService;
     private final UserService userService;
+    private final SysMediaService sysMediaService;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    public AuthController(AuthService authService, UserService userService) {
+    public AuthController(AuthService authService, UserService userService, SysMediaService sysMediaService) {
         this.authService = authService;
         this.userService = userService;
+        this.sysMediaService = sysMediaService;
     }
 
     /** POST /api/auth/login — 用户登录 */
@@ -60,12 +65,13 @@ public class AuthController {
         return Result.ok(user);
     }
 
-    /** PUT /api/auth/profile — 修改个人信息（昵称/邮箱/头像/简介/密码） */
+    /** PUT /api/auth/profile — 修改个人信息（昵称/邮箱/头像/简介/手机号/密码） */
     @PutMapping("/profile")
     public Result<?> profile(@RequestBody Map<String, String> body) {
         User user = userService.getById(UserContext.getUserId());
         if (body.containsKey("nickname")) user.setNickname(body.get("nickname"));
         if (body.containsKey("email")) user.setEmail(body.get("email"));
+        if (body.containsKey("phone")) user.setPhone(body.get("phone"));
         if (body.containsKey("avatar")) user.setAvatar(body.get("avatar"));
         if (body.containsKey("bio")) user.setBio(body.get("bio"));
         if (StringUtils.hasText(body.get("password"))) {
@@ -73,5 +79,11 @@ public class AuthController {
         }
         userService.updateById(user);
         return Result.ok();
+    }
+
+    /** GET /api/auth/avatars — 获取所有用户可用头像（需登录） */
+    @GetMapping("/avatars")
+    public Result<List<SysMedia>> avatars() {
+        return Result.ok(sysMediaService.getAvatars());
     }
 }

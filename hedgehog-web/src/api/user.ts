@@ -12,6 +12,9 @@ export interface UserRecord {
   nickname: string
   email: string
   phone: string
+  avatar: string
+  bio: string
+  role: string
   status: number
   createTime: string
 }
@@ -28,6 +31,9 @@ export interface UserSaveParams {
   nickname?: string
   email?: string
   phone?: string
+  avatar?: string
+  bio?: string
+  role?: string
   status?: number
 }
 

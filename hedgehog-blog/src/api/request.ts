@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { getToken, removeToken } from '@/utils/auth'
+import { message } from '@/utils/message'
 
 const request = axios.create({
   baseURL: '/api',
@@ -22,12 +23,16 @@ request.interceptors.response.use(
         removeToken()
         window.location.hash = '#/login'
       }
-      return Promise.reject(new Error(data.message || 'Error'))
+      message.error(data.message || '请求失败')
+      return Promise.reject(new Error(data.message || '请求失败'))
     }
     return data.data
   },
   (error) => {
-    return Promise.reject(error)
+    const serverMsg = error.response?.data?.message
+    const msg = serverMsg || error.message || '网络异常'
+    message.error(msg)
+    return Promise.reject(new Error(msg))
   },
 )
 

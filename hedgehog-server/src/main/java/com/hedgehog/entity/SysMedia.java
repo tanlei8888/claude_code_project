@@ -26,6 +26,8 @@ public class SysMedia {
     private String mimeType;
     /** 上传者用户 ID */
     private Long uploadUserId;
+    /** 媒体类型：CONTENT=文章内容 AVATAR=用户头像 PRIVATE=私密 */
+    private String mediaType;
     /** 创建时间 */
     private LocalDateTime createTime;
     /** 逻辑删除：0=未删除 1=已删除 */

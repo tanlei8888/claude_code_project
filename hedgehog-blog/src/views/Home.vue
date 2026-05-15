@@ -2,7 +2,7 @@
   <div class="max-w-4xl mx-auto px-6 py-8">
     <!-- 分类/标签筛选 -->
     <div class="mb-8 flex flex-wrap items-center gap-3">
-      <button @click="activeFilter = null; currentSlug = ''; loadArticles()"
+      <button @click="activeFilter = null; currentSlug = ''; router.push('/'); loadArticles()"
         :class="['px-3 py-1.5 rounded-full text-sm transition-colors', !activeFilter ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200']">
         全部
       </button>

@@ -13,6 +13,7 @@ export interface UserInfo {
   username: string
   nickname: string
   email: string
+  phone: string
   avatar: string
   bio: string
   role: string
@@ -32,4 +33,14 @@ export function getInfo(): Promise<UserInfo> {
 
 export function updateProfile(data: Record<string, string>): Promise<void> {
   return request.put('/auth/profile', data)
+}
+
+export interface AvatarItem {
+  id: number
+  url: string
+  filename: string
+}
+
+export function getAvatars(): Promise<AvatarItem[]> {
+  return request.get('/auth/avatars')
 }

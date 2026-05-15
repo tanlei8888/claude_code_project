@@ -108,6 +108,7 @@ CREATE TABLE IF NOT EXISTS `sys_media` (
     `file_size`      BIGINT       DEFAULT NULL        COMMENT '字节数',
     `mime_type`      VARCHAR(100) DEFAULT NULL        COMMENT 'MIME 类型',
     `upload_user_id` BIGINT       DEFAULT NULL        COMMENT '上传者',
+    `media_type`     VARCHAR(20)  NOT NULL DEFAULT 'CONTENT' COMMENT 'CONTENT|AVATAR|PRIVATE',
     `create_time`    DATETIME     DEFAULT CURRENT_TIMESTAMP,
     `deleted`        TINYINT      DEFAULT 0           COMMENT '逻辑删除',
     PRIMARY KEY (`id`)
@@ -136,3 +137,6 @@ CREATE TABLE IF NOT EXISTS `site_config` (
 
 INSERT IGNORE INTO `site_config` (`id`, `site_name`, `site_subtitle`, `author_name`)
 VALUES (1, 'Hedgehog Blog', 'A personal tech blog', 'Hedgehog');
+
+-- 增量变更：已建表的需手动执行以下 ALTER（首次建表无需执行，因上方 CREATE TABLE 已包含该列）
+-- ALTER TABLE `sys_media` ADD COLUMN `media_type` VARCHAR(20) NOT NULL DEFAULT 'CONTENT' COMMENT 'CONTENT|AVATAR|PRIVATE';

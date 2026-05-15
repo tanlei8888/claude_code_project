@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 /**
  * 全局异常处理器。
@@ -46,6 +47,21 @@ public class GlobalExceptionHandler {
                 .reduce((a, b) -> a + "; " + b)
                 .orElse("参数校验失败");
         return Result.fail(ResultCode.PARAM_ERROR.getCode(), message);
+    }
+
+    /**
+     * 处理文件上传大小超限异常。
+     *
+     * <p>当上传文件超过 spring.servlet.multipart.max-file-size 配置值时，
+     * Spring Boot 会在请求到达 Controller 之前抛出此异常。
+     *
+     * @param e 文件大小超限异常
+     * @return 文件大小超限错误响应（code=2404）
+     */
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public Result<Void> handleMaxUploadSizeExceeded(MaxUploadSizeExceededException e) {
+        log.warn("上传文件大小超限: {}", e.getMessage());
+        return Result.fail(ResultCode.FILE_SIZE_EXCEEDED);
     }
 
     /**
