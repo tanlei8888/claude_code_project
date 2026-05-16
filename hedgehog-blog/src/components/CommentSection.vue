@@ -75,25 +75,30 @@
 </template>
 
 <script setup lang="ts">
+// 评论区组件 — 支持两层嵌套评论（顶级+回复），分页加载，发表/回复评论
 import { ref, onMounted, watch } from 'vue'
 import { useUserStore } from '@/stores/user'
 import { getComments, createComment, type Comment } from '@/api/comment'
 
-const props = defineProps<{ articleId: number; commentCount: number }>()
+const props = defineProps<{
+  articleId: number    // 所属文章 ID
+  commentCount: number // 文章当前评论总数（用于初始化显示）
+}>()
 
 const userStore = useUserStore()
-const comments = ref<Comment[]>([])
-const newComment = ref('')
-const replyContent = ref('')
-const replyTo = ref<Comment | null>(null)
-const loading = ref(false)
-const submitting = ref(false)
-const page = ref(1)
-const hasMore = ref(false)
-const totalComments = ref(props.commentCount)
+const comments = ref<Comment[]>([])        // 当前页评论列表
+const newComment = ref('')                 // 新评论输入内容
+const replyContent = ref('')              // 回复输入内容
+const replyTo = ref<Comment | null>(null)  // 当前正在回复的评论（null 表示非回复状态）
+const loading = ref(false)                 // 分页加载中
+const submitting = ref(false)              // 提交评论中
+const page = ref(1)                        // 当前页码
+const hasMore = ref(false)                 // 是否还有更多评论
+const totalComments = ref(props.commentCount) // 评论总数（随新增递增）
 
 const defaultAvatar = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjOTM1MkQzIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjNEM2REZGIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiByeD0iMjAiIGZpbGw9InVybCgjZykiLz48L3N2Zz4='
 
+// 分页加载评论列表，p=1 时替换当前列表，否则追加
 async function loadComments(p = 1) {
   if (loading.value) return
   loading.value = true
@@ -111,6 +116,7 @@ async function loadComments(p = 1) {
   }
 }
 
+// 发表顶级评论
 async function handleComment() {
   if (!newComment.value.trim()) return
   submitting.value = true
@@ -126,6 +132,7 @@ async function handleComment() {
   }
 }
 
+// 回复某条评论，携带 parentId 和 replyToUserId 标识二级回复关系
 async function handleReply(parent: Comment) {
   if (!replyContent.value.trim()) return
   try {
@@ -144,6 +151,7 @@ async function handleReply(parent: Comment) {
   }
 }
 
+// 格式化日期为智能相对时间（刚刚/X分钟前/X小时前/日期）
 function formatDate(date: string) {
   if (!date) return ''
   const d = new Date(date)
@@ -157,5 +165,6 @@ function formatDate(date: string) {
 
 onMounted(() => loadComments())
 
+// 同步外部传入的评论数变化
 watch(() => props.commentCount, (v) => { totalComments.value = v })
 </script>

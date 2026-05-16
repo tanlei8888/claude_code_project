@@ -37,6 +37,7 @@
 </template>
 
 <script setup lang="ts">
+// 标签管理组件 — 表格列表 + 弹窗表单（新建/编辑）+ 删除确认
 import { ref, onMounted } from 'vue'
 import { getTags, createTag, updateTag, deleteTag } from '@/api/tag'
 import { ElMessage } from 'element-plus'
@@ -44,21 +45,24 @@ import { ElMessage } from 'element-plus'
 const tags = ref<any[]>([])
 const loading = ref(false)
 const dialogVisible = ref(false)
-const editId = ref<number | null>(null)
+const editId = ref<number | null>(null)           // 编辑中的标签 ID，null = 新建模式
 const form = ref({ name: '', slug: '' })
 
+// 打开新建/编辑弹窗
 function openDialog(row?: any) {
   editId.value = row ? row.id : null
   form.value = { name: row?.name || '', slug: row?.slug || '' }
   dialogVisible.value = true
 }
 
+// 加载全部标签
 async function load() {
   loading.value = true
   try { tags.value = (await getTags()).data }
   finally { loading.value = false }
 }
 
+// 保存标签（新建或更新）
 async function handleSave() {
   if (!form.value.name) { ElMessage.warning('请输入名称'); return }
   if (editId.value) {
@@ -71,6 +75,7 @@ async function handleSave() {
   load()
 }
 
+// 删除标签（含确认弹窗）
 async function handleDelete(id: number) {
   await deleteTag(id)
   ElMessage.success('已删除')

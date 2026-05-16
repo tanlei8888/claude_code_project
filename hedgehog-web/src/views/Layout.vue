@@ -76,6 +76,7 @@
 </template>
 
 <script setup lang="ts">
+// 主布局组件 — 左侧可收起菜单（Element Plus el-menu）+ 顶部用户下拉 + 内容区域 router-view
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { User, Fold, Expand, ArrowDown, DataBoard, Document, ChatLineSquare, Picture, Setting } from '@element-plus/icons-vue'
@@ -84,8 +85,9 @@ import { useUserStore } from '@/stores/user'
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
-const isCollapse = ref(false)
+const isCollapse = ref(false)               // 侧边栏收起状态
 
+// 当前激活的菜单项，处理文章/分类/标签子路由的统一高亮
 const activeMenu = computed(() => {
   const path = route.path
   if (path.startsWith('/articles')) return '/articles'
@@ -94,6 +96,7 @@ const activeMenu = computed(() => {
   return path
 })
 
+// 根据路径决定是否需要展开"内容管理"子菜单
 const defaultOpeneds = computed(() => {
   const path = route.path
   if (path.startsWith('/articles') || path.startsWith('/categories') || path.startsWith('/tags')) {
@@ -102,16 +105,19 @@ const defaultOpeneds = computed(() => {
   return []
 })
 
+// 菜单点击 → 路由跳转
 function handleMenuSelect(index: string) {
   router.push(index)
 }
 
+// 处理右上角下拉菜单指令（目前仅"退出登录"）
 function handleCommand(command: string) {
   if (command === 'logout') {
     userStore.logout()
   }
 }
 
+// 挂载时请求用户信息
 onMounted(() => {
   userStore.fetchInfo()
 })

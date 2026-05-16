@@ -10,11 +10,13 @@
 </template>
 
 <script setup lang="ts">
+// 全局页脚 — 显示版权信息、备案号，数据来自站点配置
 import { ref, onMounted } from 'vue'
 import { getSiteConfig, type SiteConfig } from '@/api/site'
 
-const config = ref<SiteConfig | null>(null)
+const config = ref<SiteConfig | null>(null) // 站点配置，用于渲染页脚文字和备案号
 
+// 挂载后获取站点配置
 onMounted(async () => {
   try {
     config.value = await getSiteConfig()

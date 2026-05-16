@@ -1,0 +1,11 @@
+package com.hedgehog.article;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Mapper;
+
+/**
+ * 文章数据访问层。
+ */
+@Mapper
+public interface BlogArticleMapper extends BaseMapper<BlogArticle> {
+}

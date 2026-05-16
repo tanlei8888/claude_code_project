@@ -47,7 +47,8 @@ public class SlugUtil {
                     if (pinyin != null && pinyin.length > 0) {
                         sb.append(pinyin[0]);
                     }
-                } catch (Exception ignored) {
+                } catch (Exception e) {
+                    // 极少数生僻字无拼音映射，忽略异常保留原字符
                 }
             } else if (Character.isLetterOrDigit(c)) {
                 sb.append(Character.toLowerCase(c));

@@ -16,11 +16,13 @@
 </template>
 
 <script setup lang="ts">
+// 关于页 — 展示作者信息、社交链接和站点"关于"内容（Markdown 转 HTML）
 import { ref, onMounted } from 'vue'
 import { getSiteConfig, type SiteConfig } from '@/api/site'
 
-const config = ref<SiteConfig | null>(null)
+const config = ref<SiteConfig | null>(null) // 站点配置，包含作者信息和关于内容
 
+// 挂载后获取站点配置
 onMounted(async () => {
   try {
     config.value = await getSiteConfig()

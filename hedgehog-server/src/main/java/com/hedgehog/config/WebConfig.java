@@ -1,6 +1,5 @@
 package com.hedgehog.config;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -17,13 +16,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfig implements WebMvcConfigurer {
 
     private final AdminInterceptor adminInterceptor;
+    private final AppProperties appProperties;
 
-    /** 文件上传根目录，默认 uploads */
-    @Value("${app.upload.path:uploads}")
-    private String uploadPath;
-
-    public WebConfig(AdminInterceptor adminInterceptor) {
+    public WebConfig(AdminInterceptor adminInterceptor, AppProperties appProperties) {
         this.adminInterceptor = adminInterceptor;
+        this.appProperties = appProperties;
     }
 
     /**
@@ -43,6 +40,6 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/api/admin/upload/**")
-                .addResourceLocations("file:" + uploadPath + "/");
+                .addResourceLocations("file:" + appProperties.getUpload().getPath() + "/");
     }
 }

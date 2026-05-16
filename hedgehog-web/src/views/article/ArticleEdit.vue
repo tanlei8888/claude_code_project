@@ -50,6 +50,7 @@
 </template>
 
 <script setup lang="ts">
+// 文章编辑组件 — 新建/编辑文章，含 v-md-editor Markdown 编辑器 + 分类/标签/状态/置顶/定时发布
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { createArticle, updateArticle, getArticleById } from '@/api/article'
@@ -59,25 +60,26 @@ import { ElMessage } from 'element-plus'
 
 const route = useRoute()
 const router = useRouter()
-const isEdit = ref(false)
-const saving = ref(false)
-const categories = ref<any[]>([])
-const tags = ref<any[]>([])
+const isEdit = ref(false)              // 是否为编辑模式（否则为新建模式）
+const saving = ref(false)              // 保存按钮 loading 态
+const categories = ref<any[]>([])      // 分类下拉数据源
+const tags = ref<any[]>([])            // 标签多选数据源
 
 const form = ref({
-  id: null as number | null,
+  id: null as number | null,           // 新建时为 null，编辑时为文章 ID
   title: '',
-  slug: '',
-  summary: '',
-  contentMd: '',
+  slug: '',                            // URL 标识，留空后端自动生成拼音
+  summary: '',                         // 摘要，留空后端自动截取正文前段
+  contentMd: '',                       // Markdown 原文
   coverImage: '',
   categoryId: null as number | null,
-  tagIds: [] as number[],
-  status: 0,
-  isTop: 0,
-  publishTime: '',
+  tagIds: [] as number[],              // 选中的标签 ID 数组
+  status: 0,                           // 0=草稿 1=立即发布 2=定时发布 3=私密
+  isTop: 0,                            // 0=否 1=置顶
+  publishTime: '',                     // 定时发布时间，仅 status=2 时有效
 })
 
+// 加载分类和标签数据；编辑模式下回填文章信息
 async function loadData() {
   const [cats, tagsData] = await Promise.all([getCategories(), getTags()])
   categories.value = cats.data
@@ -103,6 +105,7 @@ async function loadData() {
   }
 }
 
+// 保存文章：基本校验后走创建或更新 API
 async function handleSave() {
   if (!form.value.title || !form.value.contentMd) {
     ElMessage.warning('请填写标题和内容')

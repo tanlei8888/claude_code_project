@@ -28,21 +28,25 @@
 </template>
 
 <script setup lang="ts">
+// 仪表盘组件 — 展示 4 个统计卡片 + 最近文章列表
 import { ref, onMounted } from 'vue'
 import { getDashboard, type DashboardData } from '@/api/dashboard'
 
-const recentArticles = ref<DashboardData['recentArticles']>([])
-const statCards = ref([
+const recentArticles = ref<DashboardData['recentArticles']>([])   // 最近文章列表
+const statCards = ref([                                            // 四项统计数据
   { label: '文章总数', value: 0, color: 'text-blue-600' },
   { label: '分类数量', value: 0, color: 'text-green-600' },
   { label: '标签数量', value: 0, color: 'text-orange-600' },
   { label: '评论总数', value: 0, color: 'text-purple-600' },
 ])
 
+// 根据文章状态码返回 Element Plus tag 类型
 function statusType(s: number) {
   const map: Record<number, string> = { 0: 'info', 1: 'success', 2: 'warning', 3: 'danger' }
   return map[s] || 'info'
 }
+
+// 根据文章状态码返回中文标签文字
 function statusLabel(s: number) {
   const map: Record<number, string> = { 0: '草稿', 1: '已发布', 2: '定时', 3: '私密' }
   return map[s] || '未知'

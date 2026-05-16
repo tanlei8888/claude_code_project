@@ -1,16 +1,17 @@
 package com.hedgehog;
 
-import org.mybatis.spring.annotation.MapperScan;
+import com.hedgehog.config.AppProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 /**
  * Hedgehog 博客系统后端启动类。
  *
- * <p>启用自动配置并扫描 com.hedgehog.mapper 包下的 MyBatis Plus Mapper 接口。
+ * <p>Mapper 接口均标注 {@code @Mapper}，由 MyBatis 自动注册，无需 @MapperScan。
  */
 @SpringBootApplication
-@MapperScan("com.hedgehog.mapper")
+@EnableConfigurationProperties(AppProperties.class)
 public class HedgehogApplication {
     public static void main(String[] args) {
         SpringApplication.run(HedgehogApplication.class, args);

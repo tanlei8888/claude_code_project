@@ -31,10 +31,13 @@
 </template>
 
 <script setup lang="ts">
+// 文章卡片组件 — 展示文章摘要、分类、标签、作者信息，支持悬停微动效
 import type { Article } from '@/api/article'
 
+// 文章对象，包含标题、摘要、分类、标签、作者等字段
 defineProps<{ article: Article }>()
 
+// 格式化日期为中文短格式（YYYY/MM/DD）
 function formatDate(date: string) {
   if (!date) return ''
   return new Date(date).toLocaleDateString('zh-CN')

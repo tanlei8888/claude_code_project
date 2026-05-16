@@ -42,6 +42,7 @@
 </template>
 
 <script setup lang="ts">
+// 评论管理组件 — 审核状态筛选 + 分页表格 + 通过/拒绝/删除操作
 import { ref, onMounted } from 'vue'
 import { getCommentPage, auditComment, deleteComment } from '@/api/comment'
 import { ElMessage } from 'element-plus'
@@ -50,12 +51,15 @@ const comments = ref<any[]>([])
 const loading = ref(false)
 const page = ref(1)
 const total = ref(0)
-const size = 10
-const filterStatus = ref<number | null>(null)
+const size = 10                                                      // 每页条数
+const filterStatus = ref<number | null>(null)                        // 审核状态筛选：0=待审核 1=已通过 2=已拒绝
 
+// 评论状态 → Element Plus tag 类型映射
 function statusType(s: number) { return { 0: 'warning', 1: 'success', 2: 'danger' }[s] || 'info' }
+// 评论状态 → 中文标签映射
 function statusLabel(s: number) { return { 0: '待审核', 1: '已通过', 2: '已拒绝' }[s] || '未知' }
 
+// 加载评论分页数据
 async function load() {
   loading.value = true
   try {
@@ -65,12 +69,14 @@ async function load() {
   } finally { loading.value = false }
 }
 
+// 审核评论：通过(1) 或 拒绝(2)
 async function handleAudit(id: number, status: number) {
   await auditComment(id, status)
   ElMessage.success('操作成功')
   load()
 }
 
+// 删除评论（含确认弹窗）
 async function handleDelete(id: number) {
   await deleteComment(id)
   ElMessage.success('已删除')

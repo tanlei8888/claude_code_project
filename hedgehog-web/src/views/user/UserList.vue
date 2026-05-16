@@ -133,6 +133,7 @@
 </template>
 
 <script setup lang="ts">
+// 用户管理组件 — 搜索栏 + 分页表格 + 新增/编辑弹窗（含角色、状态、头像等字段）
 import { ref, reactive, computed, onMounted } from 'vue'
 import { Search, Refresh, Plus, Edit, Delete } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules, type FormItemRule } from 'element-plus'
@@ -146,8 +147,8 @@ interface UserRecord {
   phone: string
   avatar: string
   bio: string
-  role: string
-  status: number
+  role: string          // ADMIN / USER
+  status: number        // 0=禁用 1=启用
   createTime: string
 }
 
@@ -158,33 +159,36 @@ const total = ref(0)
 const searchForm = reactive({
   page: 1,
   size: 10,
-  keyword: '',
+  keyword: '',          // 按用户名/昵称模糊搜索
 })
 
-// 弹窗相关
+// 新增/编辑弹窗
 const dialogVisible = ref(false)
 const dialogFormRef = ref<FormInstance>()
 const submitLoading = ref(false)
 const dialogForm = reactive({
   id: undefined as number | undefined,
   username: '',
-  password: '',
+  password: '',         // 编辑时留空则不修改密码
   nickname: '',
   email: '',
   phone: '',
   avatar: '',
   bio: '',
   role: 'USER',
-  status: 1,
+  status: 1,            // 默认启用
 })
 
+// 弹窗标题：根据是否已有 id 区分新增/编辑
 const dialogTitle = computed(() => (dialogForm.id ? '编辑用户' : '新增用户'))
 
+// 弹窗表单校验规则
 const dialogRules: FormRules = {
   username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
   password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
 }
 
+// 请求用户分页数据
 async function fetchData() {
   loading.value = true
   try {
@@ -198,29 +202,33 @@ async function fetchData() {
   }
 }
 
+// 搜索：重置页码后查询
 function handleSearch() {
   searchForm.page = 1
   fetchData()
 }
 
+// 重置：清空关键词后查询
 function handleReset() {
   searchForm.keyword = ''
   searchForm.page = 1
   fetchData()
 }
 
+// 打开新增弹窗
 function handleAdd() {
   resetDialogForm()
   dialogForm.status = 1
   dialogVisible.value = true
 }
 
+// 打开编辑弹窗，回填用户数据
 function handleEdit(row: UserRecord) {
   resetDialogForm()
   Object.assign(dialogForm, {
     id: row.id,
     username: row.username,
-    password: '',
+    password: '',                   // 编辑时密码留空
     nickname: row.nickname || '',
     email: row.email || '',
     phone: row.phone || '',
@@ -232,6 +240,7 @@ function handleEdit(row: UserRecord) {
   dialogVisible.value = true
 }
 
+// 删除用户（含二次确认弹窗）
 async function handleDelete(row: UserRecord) {
   try {
     await ElMessageBox.confirm(`确定要删除用户「${row.username}」吗？`, '提示', {
@@ -245,9 +254,11 @@ async function handleDelete(row: UserRecord) {
   }
 }
 
+// 提交新增/编辑表单
 async function handleSubmit() {
   const rules = { ...dialogRules }
   if (dialogForm.id) {
+    // 编辑模式下密码非必填
     const pwRules = rules.password as FormItemRule[]
     pwRules[0].required = false
   }
@@ -273,10 +284,12 @@ async function handleSubmit() {
   }
 }
 
+// 弹窗关闭后重置校验状态
 function handleDialogClosed() {
   dialogFormRef.value?.resetFields()
 }
 
+// 重置弹窗表单到初始值
 function resetDialogForm() {
   dialogForm.id = undefined
   dialogForm.username = ''

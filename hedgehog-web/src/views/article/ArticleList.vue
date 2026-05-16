@@ -58,6 +58,7 @@
 </template>
 
 <script setup lang="ts">
+// 文章列表组件 — 状态筛选 + 关键词搜索 + 分页表格 + 发布/置顶/删除操作
 import { ref, onMounted } from 'vue'
 import { getArticlePage, deleteArticle, updateArticleStatus, toggleArticleTop, type Article } from '@/api/article'
 import { ElMessage } from 'element-plus'
@@ -66,13 +67,16 @@ const articles = ref<Article[]>([])
 const loading = ref(false)
 const page = ref(1)
 const total = ref(0)
-const size = 10
-const filterStatus = ref<number | null>(null)
-const keyword = ref('')
+const size = 10                                                      // 每页条数
+const filterStatus = ref<number | null>(null)                        // 状态筛选：0-3 或 null（全部）
+const keyword = ref('')                                             // 标题搜索关键词
 
+// 文章状态 → Element Plus tag 类型映射
 function statusType(s: number) { return { 0: 'info', 1: 'success', 2: 'warning', 3: 'danger' }[s] || 'info' }
+// 文章状态 → 中文标签映射
 function statusLabel(s: number) { return { 0: '草稿', 1: '已发布', 2: '定时', 3: '私密' }[s] || '未知' }
 
+// 加载文章分页数据
 async function load() {
   loading.value = true
   try {
@@ -84,18 +88,21 @@ async function load() {
   } finally { loading.value = false }
 }
 
+// 快速发布（将草稿/定时/私密转为已发布）
 async function handlePublish(row: Article) {
   await updateArticleStatus(row.id, 1)
   ElMessage.success('已发布')
   load()
 }
 
+// 切换置顶状态
 async function handleTop(row: Article) {
   await toggleArticleTop(row.id)
   ElMessage.success(row.isTop ? '已取消置顶' : '已置顶')
   load()
 }
 
+// 删除文章（含确认弹窗）
 async function handleDelete(id: number) {
   await deleteArticle(id)
   ElMessage.success('已删除')

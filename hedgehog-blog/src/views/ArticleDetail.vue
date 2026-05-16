@@ -62,7 +62,7 @@
         <!-- 目录侧边栏 -->
         <aside class="hidden lg:block w-56 flex-shrink-0">
           <div class="sticky top-24">
-            <TocSidebar />
+            <TocSidebar v-if="article" />
           </div>
         </aside>
       </div>
@@ -73,30 +73,36 @@
 </template>
 
 <script setup lang="ts">
+// 文章详情页 — 渲染正文、目录导航、标签、点赞区和评论区，注入 SEO 标签和结构化数据
 import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { getArticleBySlug, type Article } from '@/api/article'
 import { toggleLike as toggleLikeApi } from '@/api/like'
 import { useUserStore } from '@/stores/user'
+import { useSeo } from '@/composables/useSeo'
+import { useJsonLd } from '@/composables/useJsonLd'
 import MarkdownRenderer from '@/components/MarkdownRenderer.vue'
 import TocSidebar from '@/components/TocSidebar.vue'
 import CommentSection from '@/components/CommentSection.vue'
 
 const route = useRoute()
+const router = useRouter()
 const userStore = useUserStore()
-const article = ref<Article | null>(null)
-const loading = ref(true)
-const liked = ref(false)
-const justLiked = ref(false)
+const article = ref<Article | null>(null) // 当前文章数据，null 表示不存在
+const loading = ref(true)                 // 首次加载骨架屏状态
+const liked = ref(false)                  // 当前用户是否已点赞
+const justLiked = ref(false)             // 刚点赞触发心跳动画标志
 
+// 格式化日期为中文短格式（YYYY/MM/DD）
 function formatDate(date: string) {
   if (!date) return ''
   return new Date(date).toLocaleDateString('zh-CN')
 }
 
+// 点赞切换：未登录跳转登录页，已登录 toggle 并更新本地计数和动画
 async function handleLike() {
   if (!userStore.isLoggedIn()) {
-    window.location.hash = '#/login'
+    router.push('/login')
     return
   }
   try {
@@ -117,9 +123,40 @@ onMounted(async () => {
     const slug = route.params.slug as string
     article.value = await getArticleBySlug(slug)
     liked.value = article.value.liked
-    document.title = `${article.value.title} - Hedgehog Blog`
-    const meta = document.querySelector('meta[name="description"]')
-    if (meta) meta.setAttribute('content', article.value.summary || article.value.title)
+
+    // 注入 SEO 元标签（title、description、keywords、Open Graph）
+    const articleTitle = `${article.value.title} - Hedgehog Blog`
+    const articleDesc = article.value.summary || article.value.title
+    const articleUrl = `${window.location.origin}/article/${slug}`
+
+    useSeo({
+      title: articleTitle,
+      description: articleDesc,
+      keywords: article.value.tags?.map(t => t.name).join(', ') || '',
+      ogTitle: article.value.title,
+      ogDescription: articleDesc,
+      ogImage: article.value.coverImage || undefined,
+      ogType: 'article',
+      ogUrl: articleUrl,
+      articlePublishedTime: article.value.publishTime || article.value.createTime,
+      articleAuthor: article.value.author?.nickname || article.value.author?.username,
+      articleTags: article.value.tags?.map(t => t.name),
+    })
+
+    // 注入 JSON-LD 结构化数据供搜索引擎使用
+    useJsonLd({
+      '@context': 'https://schema.org',
+      '@type': 'Article',
+      headline: article.value.title,
+      description: articleDesc,
+      image: article.value.coverImage || undefined,
+      datePublished: article.value.publishTime || article.value.createTime,
+      dateModified: article.value.updateTime,
+      author: {
+        '@type': 'Person',
+        name: article.value.author?.nickname || article.value.author?.username,
+      },
+    })
   } catch {
     article.value = null
   } finally {

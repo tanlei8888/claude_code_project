@@ -65,17 +65,19 @@
 </template>
 
 <script setup lang="ts">
+// 个人资料页 — 展示用户信息、可选头像列表、编辑个人资料表单
 import { ref, reactive, onMounted } from 'vue'
 import { useUserStore } from '@/stores/user'
 import { getAvatars, type AvatarItem } from '@/api/auth'
 import { message } from '@/utils/message'
 
 const userStore = useUserStore()
-const avatars = ref<AvatarItem[]>([])
-const saving = ref(false)
+const avatars = ref<AvatarItem[]>([]) // 可选头像列表
+const saving = ref(false)             // 保存提交中
 
 const defaultAvatar = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjOTM1MkQzIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjNEM2REZGIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiByeD0iMjAiIGZpbGw9InVybCgjZykiLz48L3N2Zz4='
 
+// 编辑资料表单，绑定用户可修改的字段
 const form = reactive({
   nickname: '',
   email: '',
@@ -102,6 +104,7 @@ onMounted(async () => {
   }
 })
 
+// 提交表单保存用户资料，仅发送非空字段
 async function handleSave() {
   saving.value = true
   try {

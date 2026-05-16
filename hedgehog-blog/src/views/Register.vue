@@ -27,18 +27,20 @@
 </template>
 
 <script setup lang="ts">
+// 注册页 — 用户名+昵称+密码表单，注册成功后自动登录并跳转首页
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 
 const router = useRouter()
 const userStore = useUserStore()
-const username = ref('')
-const nickname = ref('')
-const password = ref('')
-const error = ref('')
-const loading = ref(false)
+const username = ref('')    // 用户名输入
+const nickname = ref('')    // 昵称输入
+const password = ref('')    // 密码输入
+const error = ref('')      // 注册错误信息
+const loading = ref(false)  // 注册提交中
 
+// 提交注册表单，注册成功后自动登录并跳转首页
 async function handleRegister() {
   error.value = ''
   loading.value = true

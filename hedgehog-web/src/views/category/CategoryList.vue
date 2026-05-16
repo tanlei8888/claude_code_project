@@ -45,6 +45,7 @@
 </template>
 
 <script setup lang="ts">
+// 分类管理组件 — 表格列表 + 弹窗表单（新建/编辑）+ 删除确认
 import { ref, onMounted } from 'vue'
 import { getCategories, createCategory, updateCategory, deleteCategory } from '@/api/category'
 import { ElMessage } from 'element-plus'
@@ -52,9 +53,10 @@ import { ElMessage } from 'element-plus'
 const categories = ref<any[]>([])
 const loading = ref(false)
 const dialogVisible = ref(false)
-const editId = ref<number | null>(null)
+const editId = ref<number | null>(null)           // 编辑中的分类 ID，null = 新建模式
 const form = ref({ name: '', slug: '', description: '', sortOrder: 0 })
 
+// 打开新建/编辑弹窗，传入行数据为编辑模式
 function openDialog(row?: any) {
   if (row) {
     editId.value = row.id
@@ -66,12 +68,14 @@ function openDialog(row?: any) {
   dialogVisible.value = true
 }
 
+// 加载全部分类
 async function load() {
   loading.value = true
   try { categories.value = (await getCategories()).data }
   finally { loading.value = false }
 }
 
+// 保存分类（新建或更新）
 async function handleSave() {
   if (!form.value.name) { ElMessage.warning('请输入名称'); return }
   if (editId.value) {
@@ -84,6 +88,7 @@ async function handleSave() {
   load()
 }
 
+// 删除分类（含确认弹窗）
 async function handleDelete(id: number) {
   await deleteCategory(id)
   ElMessage.success('已删除')

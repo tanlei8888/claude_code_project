@@ -54,25 +54,28 @@
 </template>
 
 <script setup lang="ts">
+// 首页/文章列表 — 支持分类/标签筛选、关键词搜索、分页，复用于分类/标签页（通过路由 slug）
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getArticles, getCategories, getTags, type Article, type Category, type Tag } from '@/api/article'
+import { useSeo } from '@/composables/useSeo'
 import ArticleCard from '@/components/ArticleCard.vue'
 
 const route = useRoute()
 const router = useRouter()
 
-const articles = ref<Article[]>([])
-const categories = ref<Category[]>([])
-const tags = ref<Tag[]>([])
-const loading = ref(false)
-const page = ref(1)
-const totalPages = ref(1)
-const keyword = ref('')
-const activeFilter = ref<string | null>(null)
-const currentSlug = ref('')
-let filterId: number | null = null
+const articles = ref<Article[]>([])             // 当前页文章列表
+const categories = ref<Category[]>([])          // 全部分类（用于筛选按钮）
+const tags = ref<Tag[]>([])                     // 全部标签（用于筛选按钮）
+const loading = ref(false)                      // 列表加载状态
+const page = ref(1)                             // 当前页码
+const totalPages = ref(1)                       // 总页数
+const keyword = ref('')                         // 搜索关键词
+const activeFilter = ref<string | null>(null)   // 当前筛选类型：'category' | 'tag' | null
+const currentSlug = ref('')                     // 当前筛选的分类/标签 slug（用于高亮按钮）
+let filterId: number | null = null              // 当前筛选的分类/标签 ID
 
+// 加载文章列表，支持分页、分类/标签筛选和关键词搜索
 async function loadArticles(p = 1) {
   loading.value = true
   try {
@@ -89,6 +92,7 @@ async function loadArticles(p = 1) {
   }
 }
 
+// 按分类筛选，同步更新路由
 function filterByCategory(cat: Category) {
   activeFilter.value = 'category'
   currentSlug.value = cat.slug
@@ -98,6 +102,7 @@ function filterByCategory(cat: Category) {
   loadArticles()
 }
 
+// 按标签筛选，同步更新路由
 function filterByTag(tag: Tag) {
   activeFilter.value = 'tag'
   currentSlug.value = tag.slug
@@ -107,6 +112,7 @@ function filterByTag(tag: Tag) {
   loadArticles()
 }
 
+// 关键词搜索，清除筛选状态
 function search() {
   activeFilter.value = null
   currentSlug.value = ''
@@ -118,19 +124,27 @@ onMounted(async () => {
   const [cats, tagsData] = await Promise.all([getCategories(), getTags()])
   categories.value = cats
   tags.value = tagsData
-  // 检查路由是否是分类/标签页
+  // 检查路由 slug 参数以恢复分类/标签筛选状态
   if (route.params.slug) {
     const cat = cats.find(c => c.slug === route.params.slug)
     if (cat) {
       activeFilter.value = 'category'
       currentSlug.value = cat.slug
       filterId = cat.id
+      useSeo({
+        title: `${cat.name} - 分类 - Hedgehog Blog`,
+        description: cat.description || `浏览 ${cat.name} 分类下的所有文章`,
+      })
     } else {
       const tag = tagsData.find(t => t.slug === route.params.slug)
       if (tag) {
         activeFilter.value = 'tag'
         currentSlug.value = tag.slug
         filterId = tag.id
+        useSeo({
+          title: `#${tag.name} - 标签 - Hedgehog Blog`,
+          description: `浏览带有 ${tag.name} 标签的文章`,
+        })
       }
     }
   }

@@ -44,6 +44,7 @@
 </template>
 
 <script setup lang="ts">
+// 媒体管理组件 — 网格展示 + 上传（带分类选择）+ 复制 URL + 删除 + 分类更改
 import { ref, onMounted } from 'vue'
 import { getMediaPage, uploadFile, deleteMedia, updateMediaType } from '@/api/media'
 import { ElMessage } from 'element-plus'
@@ -52,9 +53,10 @@ const mediaList = ref<any[]>([])
 const loading = ref(false)
 const page = ref(1)
 const total = ref(0)
-const size = 12
-const uploadType = ref('CONTENT')
+const size = 12                                                        // 每页 12 张，适配 4 列网格
+const uploadType = ref('CONTENT')                                      // 上传时默认媒体分类：CONTENT | AVATAR | PRIVATE
 
+// 加载媒体分页数据
 async function load() {
   loading.value = true
   try {
@@ -64,24 +66,28 @@ async function load() {
   } finally { loading.value = false }
 }
 
+// 处理 Element Plus el-upload 的自定义上传请求
 async function handleUpload(options: any) {
   try {
     await uploadFile(options.file, uploadType.value)
     ElMessage.success('上传成功')
     load()
-  } catch { ElMessage.error('上传失败') }
+  } catch {  }
 }
 
+// 复制文件 URL 到剪贴板
 function copyUrl(url: string) {
   navigator.clipboard.writeText(url).then(() => ElMessage.success('已复制到剪贴板'))
 }
 
+// 删除媒体文件
 async function handleDelete(id: number) {
   await deleteMedia(id)
   ElMessage.success('已删除')
   load()
 }
 
+// 更改媒体分类类型
 async function handleTypeChange(id: number, mediaType: string) {
   await updateMediaType(id, mediaType)
   ElMessage.success('类型已更新')

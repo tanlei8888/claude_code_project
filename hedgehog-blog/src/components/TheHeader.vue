@@ -46,6 +46,7 @@
 </template>
 
 <script setup lang="ts">
+// 全局顶部导航栏 — 粘性定位，响应式（桌面导航栏 / 移动端汉堡菜单），展示站点名和登录状态
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
@@ -53,10 +54,11 @@ import { getSiteConfig } from '@/api/site'
 
 const router = useRouter()
 const userStore = useUserStore()
-const siteName = ref('Hedgehog')
-const menuOpen = ref(false)
+const siteName = ref('Hedgehog')           // 站点名，优先使用配置中的 siteName
+const menuOpen = ref(false)                // 移动端汉堡菜单展开状态
 const defaultAvatar = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjOTM1MkQzIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjNEM2REZGIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiByeD0iMjAiIGZpbGw9InVybCgjZykiLz48L3N2Zz4='
 
+// 挂载后从站点配置获取站点名
 onMounted(async () => {
   try {
     const config = await getSiteConfig()
@@ -64,6 +66,7 @@ onMounted(async () => {
   } catch {}
 })
 
+// 退出登录：清除 token 并跳转首页
 function handleLogout() {
   userStore.logout()
   router.push('/')

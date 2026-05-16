@@ -9,6 +9,7 @@
 </template>
 
 <script setup lang="ts">
+// 根组件 — 全局布局框架：顶部导航 + 路由视图 + 页脚，挂载时恢复登录态
 import { onMounted } from 'vue'
 import { useUserStore } from '@/stores/user'
 import TheHeader from '@/components/TheHeader.vue'

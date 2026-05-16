@@ -30,6 +30,8 @@ public class MarkdownUtil {
                 TocExtension.create(),
                 EmojiExtension.create()
         ));
+        // 为标题元素生成 id 属性，使前端目录锚点导航生效
+        options.set(HtmlRenderer.RENDER_HEADER_ID, true);
         PARSER = Parser.builder(options).build();
         RENDERER = HtmlRenderer.builder(options).build();
     }

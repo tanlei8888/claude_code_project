@@ -61,18 +61,21 @@
 </template>
 
 <script setup lang="ts">
+// 站点配置组件 — 选项卡表单（基本设置/作者信息/社交链接/关于页 Markdown 编辑器）
 import { ref, onMounted } from 'vue'
 import { getSiteConfig, updateSiteConfig, type SiteConfig } from '@/api/site'
 import { ElMessage } from 'element-plus'
 
+// 站点配置表单数据，初始为空，挂载后从后端回填
 const form = ref<SiteConfig>({
   id: 1, siteName: '', siteSubtitle: '', siteLogo: '', siteFavicon: '',
   aboutContentMd: '', aboutContentHtml: '', authorName: '', authorAvatar: '', authorBio: '',
   socialGithub: '', socialTwitter: '', socialZhihu: '', icpNumber: '', footerText: '',
 })
 
-  const saving = ref(false)
+const saving = ref(false)              // 保存按钮 loading 态
 
+// 提交保存全部站点配置
 async function handleSave() {
   saving.value = true
   try {
@@ -84,6 +87,7 @@ async function handleSave() {
 onMounted(async () => {
   const res = await getSiteConfig()
   if (res.data) {
+    // 合并后端数据，保证 null 字段转为空字符串
     form.value = {
       ...res.data,
       aboutContentMd: res.data.aboutContentMd ?? '',

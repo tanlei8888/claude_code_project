@@ -23,17 +23,19 @@
 </template>
 
 <script setup lang="ts">
+// 登录页 — 用户名+密码表单，登录成功后跳转首页
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 
 const router = useRouter()
 const userStore = useUserStore()
-const username = ref('')
-const password = ref('')
-const error = ref('')
-const loading = ref(false)
+const username = ref('')    // 用户名输入
+const password = ref('')    // 密码输入
+const error = ref('')      // 登录错误信息
+const loading = ref(false)  // 登录提交中
 
+// 提交登录表单，成功后跳转首页
 async function handleLogin() {
   error.value = ''
   loading.value = true

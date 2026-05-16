@@ -10,6 +10,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Optional;
 
 /**
  * JWT 认证过滤器，在每个请求到达 Controller 前解析 token 并设置用户上下文。
@@ -48,14 +49,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             return;
         }
 
-        String token = extractToken(request);
-        if (token == null) {
+        Optional<String> tokenOpt = extractToken(request);
+        if (!tokenOpt.isPresent()) {
             response.setContentType("application/json;charset=UTF-8");
             response.setStatus(401);
             response.getWriter().write("{\"code\":401,\"message\":\"请先登录\"}");
             return;
         }
 
+        String token = tokenOpt.get();
         try {
             Long userId = jwtUtil.getUserIdFromToken(token);
             String role = jwtUtil.parseToken(token).get("role", String.class);
@@ -76,13 +78,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
      * 从请求头中提取 Bearer token。
      *
      * @param request HTTP 请求
-     * @return token 字符串（不含 "Bearer " 前缀），无则返回 null
+     * @return token 字符串（不含 "Bearer " 前缀），无则返回 Optional.empty()
      */
-    private String extractToken(HttpServletRequest request) {
+    private Optional<String> extractToken(HttpServletRequest request) {
         String header = request.getHeader("Authorization");
         if (StringUtils.hasText(header) && header.startsWith("Bearer ")) {
-            return header.substring(7);
+            return Optional.of(header.substring(7));
         }
-        return null;
+        return Optional.empty();
     }
 }

@@ -1,7 +1,7 @@
 package com.hedgehog.config;
 
-import com.hedgehog.entity.User;
-import com.hedgehog.service.UserService;
+import com.hedgehog.user.User;
+import com.hedgehog.user.UserService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;

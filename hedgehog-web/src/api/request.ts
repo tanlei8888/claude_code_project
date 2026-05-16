@@ -1,8 +1,10 @@
+// Axios 请求封装 — 统一 baseURL、超时与拦截器，返回 ApiResponse<T> 结构
 import axios from 'axios'
 import { getToken, removeToken } from '@/utils/auth'
 import { ElMessage } from 'element-plus'
 import router from '@/router'
 
+// 后端统一响应结构
 export interface ApiResponse<T = unknown> {
   code: number
   message: string
@@ -10,11 +12,11 @@ export interface ApiResponse<T = unknown> {
 }
 
 const instance = axios.create({
-  baseURL: '/api',
-  timeout: 15000,
+  baseURL: '/api',            // Vite proxy 转发至 localhost:8080
+  timeout: 15000,             // 15 秒超时
 })
 
-// 请求拦截器：携带 token
+// 请求拦截器：自动携带 JWT token
 instance.interceptors.request.use(
   (config) => {
     const token = getToken()
@@ -26,7 +28,7 @@ instance.interceptors.request.use(
   (error) => Promise.reject(error),
 )
 
-// 响应拦截器：统一处理错误
+// 响应拦截器：code 非 200 统一弹窗提示；401 清空 token 并跳转登录
 instance.interceptors.response.use(
   (response) => {
     const res = response.data
