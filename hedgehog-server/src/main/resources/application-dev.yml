@@ -11,9 +11,9 @@ spring:
       max-file-size: 10MB
       max-request-size: 12MB
   datasource:
-    url: jdbc:mysql://120.79.83.62:54231/hedgehog_dev?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&connectionCollation=utf8mb4_unicode_ci
-    username: root
-    password: Xx199588@
+    url: jdbc:mysql://xxxxxxxxxx/hedgehog_dev?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&connectionCollation=utf8mb4_unicode_ci
+    username: xxx
+    password: xxxxxxxx
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       max-lifetime: 120000
