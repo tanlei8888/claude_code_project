@@ -3,12 +3,7 @@ server:
 
 spring:
   profiles:
-    active: dev
-  datasource:
-    url: jdbc:mysql://120.79.83.62:54231/hedgehog_prod?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&connectionCollation=utf8mb4_unicode_ci
-    username: root
-    password: Xx199588@
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    active: ${SPRING_PROFILES_ACTIVE:dev}
 
 mybatis-plus:
   global-config:
@@ -19,5 +14,8 @@ mybatis-plus:
       id-type: assign_id
 
 jwt:
-  secret: hedgehog-jwt-secret-key-2024-must-be-at-least-256-bits-long
   expiration: 86400000
+
+app:
+  upload:
+    path: uploads

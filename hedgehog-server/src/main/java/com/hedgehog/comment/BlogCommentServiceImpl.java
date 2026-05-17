@@ -107,8 +107,8 @@ public class BlogCommentServiceImpl extends ServiceImpl<BlogCommentMapper, BlogC
         comment.setContent(request.getContent());
         comment.setParentId(request.getParentId());
         comment.setReplyToUserId(request.getReplyToUserId());
-        // 新评论默认待审核
-        comment.setStatus(0);
+        // 新评论默认直接发布
+        comment.setStatus(1);
         baseMapper.insert(comment);
         // 更新文章评论数（仅统计已通过的评论）
         long count = count(new LambdaQueryWrapper<BlogComment>()

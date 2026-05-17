@@ -6,6 +6,7 @@ import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 
 export default defineConfig({
+  base: '/admin/', // 生产部署在 sanshige.cn/admin 路径下
   plugins: [
     vue(),
     AutoImport({

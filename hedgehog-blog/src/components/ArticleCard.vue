@@ -7,7 +7,11 @@
         </span>
         <span v-if="article.isTop" class="text-orange-500 bg-orange-50 px-2 py-0.5 rounded-full">置顶</span>
         <span>{{ formatDate(article.createTime) }}</span>
-        <span class="ml-auto">{{ article.viewCount }} 阅读</span>
+        <span class="ml-auto flex items-center gap-3">
+          <span>{{ article.viewCount }} 阅读</span>
+          <span>{{ article.likeCount }} 赞</span>
+          <span>{{ article.commentCount }} 评论</span>
+        </span>
       </div>
       <h2 class="text-xl font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
         {{ article.title }}

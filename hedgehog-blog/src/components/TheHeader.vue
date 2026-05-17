@@ -1,7 +1,8 @@
 <template>
   <header class="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-gray-100">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-      <router-link to="/" class="text-lg sm:text-xl font-bold tracking-tight text-gray-900 hover:text-blue-600 transition-colors">
+      <router-link to="/" class="flex items-center gap-2 text-lg sm:text-xl font-bold tracking-tight text-gray-900 hover:text-blue-600 transition-colors">
+        <img v-if="siteLogo" :src="siteLogo" :alt="siteName" class="h-8 w-auto object-contain rounded-xl shadow-sm ring-1 ring-gray-200/60 transition-transform duration-200 group-hover:scale-105" />
         {{ siteName }}
       </router-link>
       <!-- 桌面端导航 -->
@@ -55,14 +56,16 @@ import { getSiteConfig } from '@/api/site'
 const router = useRouter()
 const userStore = useUserStore()
 const siteName = ref('Hedgehog')           // 站点名，优先使用配置中的 siteName
+const siteLogo = ref('')                 // 站点 Logo URL
 const menuOpen = ref(false)                // 移动端汉堡菜单展开状态
 const defaultAvatar = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjOTM1MkQzIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjNEM2REZGIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiByeD0iMjAiIGZpbGw9InVybCgjZykiLz48L3N2Zz4='
 
-// 挂载后从站点配置获取站点名
+// 挂载后从站点配置获取站点名和 Logo
 onMounted(async () => {
   try {
     const config = await getSiteConfig()
     siteName.value = config.siteName || 'Hedgehog'
+    siteLogo.value = config.siteLogo || ''
   } catch {}
 })
 

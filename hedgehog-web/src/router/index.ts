@@ -79,7 +79,7 @@ const routes = [
 ]
 
 const router = createRouter({
-  history: createWebHashHistory(),
+  history: createWebHashHistory('/admin/'), // base 与 Vite base 一致，URL 为 /admin/#/dashboard
   routes,
 })
 

@@ -1,0 +1,37 @@
+# 生产环境配置 — 所有敏感值通过环境变量注入，禁止硬编码
+server:
+  port: ${SERVER_PORT:8080}
+
+spring:
+  flyway:
+    enabled: true
+    encoding: UTF-8
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 12MB
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      max-lifetime: 1800000
+      connection-test-query: SELECT 1
+      maximum-pool-size: 20
+      minimum-idle: 5
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION:86400000}
+
+app:
+  upload:
+    path: ${UPLOAD_PATH:/home/app/sanshige.cn/uploads}
+  cors:
+    allowed-origins: ${CORS_ORIGINS:https://sanshige.cn}
+
+logging:
+  level:
+    com.hedgehog: INFO
+    org.springframework: WARN

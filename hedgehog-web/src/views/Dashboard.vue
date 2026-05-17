@@ -41,9 +41,9 @@ const statCards = ref([                                            // 四项统�
 ])
 
 // 根据文章状态码返回 Element Plus tag 类型
-function statusType(s: number) {
-  const map: Record<number, string> = { 0: 'info', 1: 'success', 2: 'warning', 3: 'danger' }
-  return map[s] || 'info'
+function statusType(s: number): 'info' | 'success' | 'warning' | 'danger' {
+  const map = { 0: 'info', 1: 'success', 2: 'warning', 3: 'danger' } as const
+  return map[s as keyof typeof map] || 'info'
 }
 
 // 根据文章状态码返回中文标签文字

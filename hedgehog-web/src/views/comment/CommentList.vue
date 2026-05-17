@@ -55,7 +55,10 @@ const size = 10                                                      // 每页�
 const filterStatus = ref<number | null>(null)                        // 审核状态筛选：0=待审核 1=已通过 2=已拒绝
 
 // 评论状态 → Element Plus tag 类型映射
-function statusType(s: number) { return { 0: 'warning', 1: 'success', 2: 'danger' }[s] || 'info' }
+function statusType(s: number): 'info' | 'success' | 'warning' | 'danger' {
+  const map = { 0: 'warning', 1: 'success', 2: 'danger' } as const
+  return map[s as keyof typeof map] || 'info'
+}
 // 评论状态 → 中文标签映射
 function statusLabel(s: number) { return { 0: '待审核', 1: '已通过', 2: '已拒绝' }[s] || '未知' }
 

@@ -72,7 +72,10 @@ const filterStatus = ref<number | null>(null)                        // 状态�
 const keyword = ref('')                                             // 标题搜索关键词
 
 // 文章状态 → Element Plus tag 类型映射
-function statusType(s: number) { return { 0: 'info', 1: 'success', 2: 'warning', 3: 'danger' }[s] || 'info' }
+function statusType(s: number): 'info' | 'success' | 'warning' | 'danger' {
+  const map = { 0: 'info', 1: 'success', 2: 'warning', 3: 'danger' } as const
+  return map[s as keyof typeof map] || 'info'
+}
 // 文章状态 → 中文标签映射
 function statusLabel(s: number) { return { 0: '草稿', 1: '已发布', 2: '定时', 3: '私密' }[s] || '未知' }
 
