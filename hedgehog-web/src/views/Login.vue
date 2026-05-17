@@ -45,8 +45,8 @@ const formRef = ref<FormInstance>()        // 表单实例引用，用于校验
 const loading = ref(false)                  // 登录按钮 loading 态
 
 const form = reactive({
-  username: 'admin',      // 默认填充开发账号
-  password: 'admin123',
+  username: '',      // 默认填充开发账号
+  password: '',
 })
 
 const rules: FormRules = {
